@@ -7,17 +7,13 @@ import startRecording from './services/recordingService';
 import loadCookie from './utils/cookieUtils';
 import { CONFIG_FILE_PATH } from './constants/appConstants';
 
-// https://webcast.tiktok.com/webcast/room/info/?aid=1988&region=FI&room_id=7437613792145509152
-
-export let cookie: string = "";
-
 (async () => {
   try {
     const tomlContent: string = await fs.readFile(CONFIG_FILE_PATH, "utf8");
     const config: Record<string, unknown> = toml.parse(tomlContent)
     const { username, retry_delay, use_cookie, cookie_path, get_cookie, output, live_quality } = validateAndLoadConfig(config);
 
-    if (use_cookie) cookie = await loadCookie(cookie_path, get_cookie);
+    if (use_cookie) await loadCookie(cookie_path, get_cookie);
 
     if (await retry(() => checkIfBlacklisted(username), retry_delay)) 
       return console.warn("User is blacklisted");
