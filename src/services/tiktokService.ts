@@ -1,6 +1,6 @@
 import { parse } from 'node-html-parser';
 import { CheckAliveResponse, LiveRoomData, StreamURLResponse } from '../interfaces/interfaces';
-import { TIKTOK_CHECK_ALIVE_URL, TIKTOK_LIVE_URL, TIKTOK_ROOM_INFO_URL } from '../constants/appConstants';
+import { TIKTOK_CHECK_ALIVE_URL, TIKTOK_LIVE_URL, TIKTOK_REGION, TIKTOK_ROOM_INFO_URL } from '../constants/appConstants';
 import { fetchJSON, fetchSite } from '../utils/fetchUtils';
 
 export async function checkIfLive(roomID: number): Promise<boolean> {
@@ -35,7 +35,7 @@ export async function getRoomID(username: string): Promise<number | null> {
 }
 
 export async function checkIfBlacklisted(username: string): Promise<boolean> {
-  const response = await fetch(`https://www.tiktok.com/@${username}/live?region=FI`);
+  const response = await fetch(`https://www.tiktok.com/@${username}/live?region=${TIKTOK_REGION}`);
   console.info("Not Blacklisted");
   return response.redirected;
 }

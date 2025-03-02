@@ -1,4 +1,4 @@
-import { COOKIE_PATH, LIVE_QUALITY, OUTPUT_DIR, RETRY_DELAY } from "../constants/appConstants";
+import { COOKIE_PATH, LIVE_QUALITY, OUTPUT_DIR, RETRY_DELAY, TIKTOK_REGION } from "../constants/appConstants";
 import fs from 'node:fs';
 
 export default function validateAndLoadConfig(config: Record<string, unknown>): { 
@@ -9,6 +9,7 @@ export default function validateAndLoadConfig(config: Record<string, unknown>): 
         get_cookie: boolean;
         output: string; 
         live_quality: string;
+        region: string;
     } {
     const username = typeof config.username === "string" ? config.username.trim() : "";
     if (username == "") throw new Error("Configuration error: 'username' is required.");
@@ -27,6 +28,10 @@ export default function validateAndLoadConfig(config: Record<string, unknown>): 
     const output = typeof config.output === "string" && config.output.trim() !== "" 
         ? config.output 
         : OUTPUT_DIR;
+
+    const region = typeof config.region === "string" && config.region.trim() !== "" 
+        ? config.region 
+        : TIKTOK_REGION; 
 
     try {
         if (!fs.existsSync(output)) {
@@ -48,6 +53,7 @@ export default function validateAndLoadConfig(config: Record<string, unknown>): 
         cookie_path, 
         get_cookie, 
         output, 
-        live_quality 
+        live_quality,
+        region,
     };
 }

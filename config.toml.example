@@ -1,0 +1,14 @@
+username=""
+retry_delay=5000
+output="" # default = "./recordings"
+live_quality="" # options = "highest" (default), "medium", "lowest"
+region="" # default = "FI"
+
+use_cookie=false # Optional, required if tiktok live is age restricted.
+cookie_path="" # default = "./cookie.json"
+
+# WIP
+# If you wanna automatically get cookie from tiktok
+get_cookie=false 
+tiktok_username=""
+tiktok_password=""
