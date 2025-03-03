@@ -24,11 +24,19 @@ export default async function startRecording(urls: string[], output: string, liv
             process.exit();
         });
 
+        // Handle Docker
+        process.stdin.resume();
+        process.on("SIGTERM", () => {
+            console.info("Closing file...")
+            if (writer) writer.close();
+            process.exit();
+        });
+
         try {
             let totalBytes = 0;
             let lastElapsedTime = 0;
             console.info("Recording started...");
-
+            
             while (true) {
                 const { value: chunk, done } = await rdr.read();
                 if (done) break;
@@ -37,13 +45,13 @@ export default async function startRecording(urls: string[], output: string, liv
                 writer.write(chunk);
 
                 if (logging) {
-                const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                    const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
                     if (elapsedTime - lastElapsedTime >= logging_delay) {
-                    lastElapsedTime = elapsedTime;
-                    const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
-                    const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');
-                    const seconds = Math.floor(elapsedTime % 60).toString().padStart(2, '0');
-                    console.info(`[${hours}:${minutes}:${seconds}] ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
+                        lastElapsedTime = elapsedTime;
+                        const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
+                        const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');
+                        const seconds = Math.floor(elapsedTime % 60).toString().padStart(2, '0');
+                        console.info(`[${hours}:${minutes}:${seconds}] ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
                     }
                 }
             }

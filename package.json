@@ -3,18 +3,25 @@
   "version": "1.0.0",
   "main": "src/main.ts",
   "scripts": {
-    "start": "npx ts-node src/main.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_PATH=./build node build/main.js",
+    "build": "npx tsc -p .",
+    "dev": "nodemon -L src/main.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "node-html-parser": "^6.1.13",
+    "selenium-webdriver": "^4.27.0",
     "toml": "^3.0.0"
   },
   "devDependencies": {
+    "@types/chromedriver": "^81.0.5",
     "@types/node": "^22.10.1",
-    "typescript": "^5.7.2"
+    "@types/selenium-webdriver": "^4.1.27",
+    "chromedriver": "^131.0.4",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }

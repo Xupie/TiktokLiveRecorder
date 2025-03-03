@@ -1,0 +1,28 @@
+services:
+  tiktok-live-recorder-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./nodemon.json:/usr/src/app/nodemon.json
+      - ./recordings:/usr/src/app/recordings
+    container_name: tiktok-live-recorder-dev
+    ports:
+      - 5622:5622
+    command: npm run dev
+
+  tiktok-live-recorder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    volumes:
+      - ./build:/usr/src/app/build
+      - ./src:/usr/src/app/src
+      - ./recordings:/usr/src/app/recordings
+    container_name: tiktok-live-recorder
+    ports:
+      - 5622:5622
+    command: node build/main.js
