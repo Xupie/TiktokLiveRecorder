@@ -7,6 +7,9 @@ region="" # default = "FI"
 use_cookie=false # Optional, required if tiktok live is age restricted.
 cookie_path="" # default = "./cookie.json"
 
+logging=true
+logging_delay=30 # In seconds
+
 # WIP
 # If you wanna automatically get cookie from tiktok
 get_cookie=false 

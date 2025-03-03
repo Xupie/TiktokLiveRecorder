@@ -20,3 +20,7 @@ export const DEFAULT_HEADERS: Record<string, string> = {
 export const OUTPUT_DIR: string = "./recordings";
 
 export const LIVE_QUALITY: string = "highest";
+
+export const LOGGING: boolean = true;
+
+export const LOGGING_DELAY: number = 30;

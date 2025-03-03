@@ -11,13 +11,14 @@ import { CONFIG_FILE_PATH } from './constants/appConstants';
   try {
     const tomlContent: string = await fs.readFile(CONFIG_FILE_PATH, "utf8");
     const config: Record<string, unknown> = toml.parse(tomlContent)
-    const { username, retry_delay, use_cookie, cookie_path, get_cookie, output, live_quality } = validateAndLoadConfig(config);
+    console.info(config);
+    const { username, retry_delay, use_cookie, cookie_path, get_cookie, output, live_quality, logging, logging_delay } = validateAndLoadConfig(config);
 
     if (use_cookie) await loadCookie(cookie_path, get_cookie);
 
     if (await retry(() => checkIfBlacklisted(username), retry_delay)) 
       return console.warn("User is blacklisted");
-  
+    
     const roomID: number | null = await retry(() => getRoomID(username), retry_delay);
     if (roomID === null) return console.warn("Failed to get room ID");
 
@@ -28,7 +29,7 @@ import { CONFIG_FILE_PATH } from './constants/appConstants';
       retryMessage = true;
       console.info("User is live, starting recording...");
       const liveURLs = await retry(() => getStreamURL(roomID), retry_delay);
-      await retry(() => startRecording(liveURLs, output, live_quality), retry_delay);
+      await retry(() => startRecording(liveURLs, output, live_quality, logging, logging_delay), retry_delay);
     } 
     else {
       if (retryMessage) {

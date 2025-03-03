@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 
-export default async function startRecording(urls: string[], output: string, live_quality: string) {
+export default async function startRecording(urls: string[], output: string, live_quality: string, logging: boolean, logging_delay: number) {
     try {
 
         const url = await getQuality(live_quality, urls);
@@ -27,6 +27,7 @@ export default async function startRecording(urls: string[], output: string, liv
         try {
             let totalBytes = 0;
             let lastElapsedTime = 0;
+            console.info("Recording started...");
 
             while (true) {
                 const { value: chunk, done } = await rdr.read();
@@ -35,13 +36,15 @@ export default async function startRecording(urls: string[], output: string, liv
                 totalBytes += chunk?.length || 0;
                 writer.write(chunk);
 
+                if (logging) {
                 const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
-                if (elapsedTime - lastElapsedTime >= 30) {
+                    if (elapsedTime - lastElapsedTime >= logging_delay) {
                     lastElapsedTime = elapsedTime;
                     const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
                     const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');
                     const seconds = Math.floor(elapsedTime % 60).toString().padStart(2, '0');
                     console.info(`[${hours}:${minutes}:${seconds}] ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
+                    }
                 }
             }
         } finally {
