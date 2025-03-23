@@ -18,7 +18,9 @@ import config from './config/config';
 
     let retryMessage: boolean = true;
 
+    while (true) {
     const isLive: boolean = await retry(() => checkIfLive(roomID), config.retry_delay);
+
     if (isLive) {
       retryMessage = true;
       console.info("User is live, starting recording...");
@@ -31,6 +33,7 @@ import config from './config/config';
         retryMessage = false;
       }
       await new Promise((resolve) => setTimeout(resolve, 30000));
+      }
     }
 
   } catch (err) {
