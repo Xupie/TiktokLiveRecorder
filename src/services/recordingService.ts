@@ -17,21 +17,16 @@ export default async function startRecording(urls: string[]) {
         const fileHandle = await fs.open(`${config.output}/${name}`, "w");
         const writer = fileHandle.createWriteStream();
 
-        // Handle Ctrl+C
-        process.stdin.resume();
-        process.on("SIGINT", () => {
-            console.info("Closing file...")
-            if (writer) writer.close();
-            process.exit();
+        // Closes file if getting shutdown signal
+        ["SIGINT", "SIGTERM", "SIGHUP", "uncaughtException", "exit"].forEach((signal) => {
+            process.on(signal, (err) => {
+                console.info("Closing file...")
+                if (writer) writer.close();
+                if (signal === "uncaughtException") console.error(err);
+                process.exit();
+            });
         });
-
-        // Handle Docker
         process.stdin.resume();
-        process.on("SIGTERM", () => {
-            console.info("Closing file...")
-            if (writer) writer.close();
-            process.exit();
-        });
 
         try {
             let totalBytes = 0;
