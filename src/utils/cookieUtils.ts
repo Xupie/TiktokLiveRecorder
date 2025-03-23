@@ -2,13 +2,12 @@ import config from '../config/config';
 import fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
-export let COOKIE_PATH = "";
-export let GET_COOKIE = false;
+import { Browser, Builder, By, Key, WebDriver } from 'selenium-webdriver';
 
 export default async function loadCookie(): Promise<string> {
     if (!fs.existsSync(config.cookie_path)) fs.writeFile(config.cookie_path, "[]", err => {
         if (err) console.error(err);
-        console.log("Created cookie file.");
+        console.info("Created cookie file.");
     });
 
     if (config.get_cookie && await isCookiesEmpty()) await getCookies();

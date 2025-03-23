@@ -1,9 +1,9 @@
+import { sendWebhookMessage } from '../utils/webhookUtils';
 import config from '../config/config';
 import fs from 'node:fs/promises';
 
 export default async function startRecording(urls: string[]) {
     try {
-
         const url = await getQuality(config.live_quality, urls);
         const response = await fetch(url)
         const rdr = response.body?.getReader();
@@ -59,6 +59,7 @@ export default async function startRecording(urls: string[]) {
         } finally {
             writer.close();
             console.info("Recording finished");
+            sendWebhookMessage(`${config.username}'s live ended.`);
         }
     } catch (err) {
         console.error("An error occurred while recording:", err);
