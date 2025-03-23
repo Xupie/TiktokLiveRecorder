@@ -1,14 +1,20 @@
 username=""
-retry_delay=5000
+retry_delay=5000 # default = 5000
 output="" # default = "./recordings"
 live_quality="" # options = "highest" (default), "medium", "lowest"
 region="" # default = "FI"
 
-use_cookie=false # Optional, required if tiktok live is age restricted.
+use_discord_webhook=false
+webhook_url=""
+
+use_cookie=false # required if tiktok live is age restricted.
 cookie_path="" # default = "./cookie.json"
 
-logging=true
-logging_delay=30 # In seconds
+logging=true # default = true
+# https://github.com/pinojs/pino/blob/4354cb960523a25c31a7b962b9477e829f183e50/docs/api.md#logger-level
+logging_level="" # default = "info"
+logging_delay=30 # In seconds # default = 30
+logging_dir="" # default = "./logs"
 
 # WIP
 # If you wanna automatically get cookie from tiktok

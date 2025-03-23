@@ -1,3 +1,4 @@
+import { logger } from '../main';
 import config from '../config/config';
 import fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -6,8 +7,8 @@ import { Browser, Builder, By, Key, WebDriver } from 'selenium-webdriver';
 
 export default async function loadCookie(): Promise<string> {
     if (!fs.existsSync(config.cookie_path)) fs.writeFile(config.cookie_path, "[]", err => {
-        if (err) console.error(err);
-        console.info("Created cookie file.");
+        if (err) logger.error(err);
+        logger.info("Created cookie file.");
     });
 
     if (config.get_cookie && await isCookiesEmpty()) await getCookies();

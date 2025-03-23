@@ -25,4 +25,8 @@ export const LOGGING: boolean = true;
 
 export const LOGGING_DELAY: number = 30;
 
+export const LOGGING_LEVEL: string = "info";
+
+export const LOGGING_DIR: string = "./logs"
+
 export const USE_DISCORD_WEBHOOK: boolean = false;

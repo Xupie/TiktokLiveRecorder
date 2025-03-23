@@ -2,6 +2,7 @@ import fs from "fs";
 import toml from "toml";
 import { CONFIG_FILE_PATH } from "../constants/appConstants";
 import validateAndLoadConfig from "./ConfigValidator";
+import { logger } from "../main";
 
 let configData: Record<string, unknown>;
 
@@ -9,7 +10,7 @@ try {
     const tomlContent = fs.readFileSync(CONFIG_FILE_PATH, "utf8");
     configData = toml.parse(tomlContent);
 } catch (err) {
-    console.error("Failed to load config:", err);
+    logger.error("Failed to load config:", err);
     process.exit(1);
 }
 
