@@ -12,6 +12,7 @@ services:
     ports:
       - 5622:5622
     command: npm run dev
+    restart: always
 
   tiktok-live-recorder:
     build:
@@ -26,3 +27,4 @@ services:
     ports:
       - 5622:5622
     command: node build/main.js
+    restart: always
