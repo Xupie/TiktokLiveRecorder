@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser';
 import { CheckAliveResponse, LiveRoomData, StreamURLResponse } from '../interfaces/interfaces';
 import { TIKTOK_CHECK_ALIVE_URL, TIKTOK_LIVE_URL, TIKTOK_REGION, TIKTOK_ROOM_INFO_URL } from '../constants/appConstants';
 import { fetchJSON, fetchSite } from '../utils/fetchUtils';
-import { logger } from '../main';
+import { logger } from '../logger';
 
 /**
  * @param roomID Live room ID

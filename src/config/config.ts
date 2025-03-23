@@ -2,7 +2,7 @@ import fs from "fs";
 import toml from "toml";
 import { CONFIG_FILE_PATH } from "../constants/appConstants";
 import validateAndLoadConfig from "./ConfigValidator";
-import { logger } from "../main";
+import { logger } from "../logger";
 
 let configData: Record<string, unknown>;
 

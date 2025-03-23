@@ -1,7 +1,7 @@
 import { sendWebhookMessage } from '../utils/webhookUtils';
 import config from '../config/config';
 import fs from 'node:fs/promises';
-import { logger } from '../main';
+import { logger } from '../logger';
 
 /**
  * Starts recording a livestream from URL

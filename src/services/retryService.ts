@@ -1,4 +1,4 @@
-import { logger } from "../main";
+import { logger } from "../logger";
 
 /**
  * @param fn Function

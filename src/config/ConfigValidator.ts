@@ -1,4 +1,4 @@
-import { logger } from "../main";
+import { logger } from "../logger";
 import { COOKIE_PATH, LIVE_QUALITY, LOGGING, LOGGING_DELAY, LOGGING_DIR, LOGGING_LEVEL, OUTPUT_DIR, RETRY_DELAY, TIKTOK_REGION } from "../constants/appConstants";
 import fs from 'node:fs';
 
@@ -12,8 +12,6 @@ const DEFAULTS = {
     live_quality: LIVE_QUALITY,
     logging: LOGGING,
     logging_delay: LOGGING_DELAY,
-    logging_level: LOGGING_LEVEL,
-    logging_dir: LOGGING_DIR,
     use_discord_webhook: false,
     webhook_url: "",
 };
@@ -37,8 +35,6 @@ export default function validateAndLoadConfig(config: Record<string, unknown>) {
     // Logging
     const logging = getBoolean(config, "logging", DEFAULTS.logging);
     const logging_delay = getNumber(config, "logging_delay", DEFAULTS.logging_delay);
-    const logging_level = getString(config, "logging_level", DEFAULTS.logging_level);
-    const logging_dir = getString(config, "logging_dir", DEFAULTS.logging_dir);
     
     // Discord webhook
     const use_discord_webhook = getBoolean(config, "use_discord_webhook", DEFAULTS.use_discord_webhook);
@@ -68,8 +64,6 @@ export default function validateAndLoadConfig(config: Record<string, unknown>) {
         region,
         logging,
         logging_delay,
-        logging_level,
-        logging_dir,
         use_discord_webhook,
         webhook_url,
     };

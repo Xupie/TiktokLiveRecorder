@@ -4,25 +4,7 @@ import startRecording from './services/recordingService';
 import loadCookie from './utils/cookieUtils';
 import config from './config/config';
 import { sendWebhookMessage } from './utils/webhookUtils';
-import { pino } from 'pino';
-
-export const logger = pino({
-  level: config.logging_level,
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      destination: `./logs/${new Date(Date.now()).toISOString().split(":")[0]}.log`   
-    },
-  },
-  redact: {
-    paths: ["webhook_url", "tiktok_username", "tiktok_password"],
-  },
-  formatters: {
-    level: (label) => {
-      return { level: label.toUpperCase() };
-    },
-  },
-});
+import { logger } from './logger';
 
 (async () => {
   try {

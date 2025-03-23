@@ -8,6 +8,7 @@ services:
       - ./src:/usr/src/app/src
       - ./nodemon.json:/usr/src/app/nodemon.json
       - ./recordings:/usr/src/app/recordings
+      - ./logs:/usr/src/app/logs
     container_name: tiktok-live-recorder-dev
     ports:
       - 5622:5622
@@ -23,6 +24,7 @@ services:
       - ./build:/usr/src/app/build
       - ./src:/usr/src/app/src
       - ./recordings:/usr/src/app/recordings
+      - ./logs:/usr/src/app/logs
     container_name: tiktok-live-recorder
     ports:
       - 5622:5622

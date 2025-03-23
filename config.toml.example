@@ -11,10 +11,7 @@ use_cookie=false # required if tiktok live is age restricted.
 cookie_path="" # default = "./cookie.json"
 
 logging=true # default = true
-# https://github.com/pinojs/pino/blob/4354cb960523a25c31a7b962b9477e829f183e50/docs/api.md#logger-level
-logging_level="" # default = "info"
 logging_delay=30 # In seconds # default = 30
-logging_dir="" # default = "./logs"
 
 # WIP
 # If you wanna automatically get cookie from tiktok
