@@ -1,39 +1,29 @@
 import { COOKIE_PATH, LIVE_QUALITY, LOGGING, LOGGING_DELAY, OUTPUT_DIR, RETRY_DELAY, TIKTOK_REGION } from "../constants/appConstants";
 import fs from 'node:fs';
 
-export default function validateAndLoadConfig(config: Record<string, unknown>): { 
-        username: string; 
-        retry_delay: number; 
-        use_cookie: boolean;
-        cookie_path: string;
-        get_cookie: boolean;
-        output: string; 
-        live_quality: string;
-        region: string;
-        logging: boolean;
-        logging_delay: number;
-    } {
-    const username = typeof config.username === "string" ? config.username.trim() : "";
-    if (username == "") throw new Error("Configuration error: 'username' is required.");
+const DEFAULTS = {
+    retry_delay: RETRY_DELAY,
+    cookie_path: COOKIE_PATH,
+    output: OUTPUT_DIR,
+    region: TIKTOK_REGION,
+    live_quality: LIVE_QUALITY,
+    logging: LOGGING,
+    logging_delay: LOGGING_DELAY,
+};
 
-    const retry_delay = typeof config.retry_delay === "number" && config.retry_delay > 0 
-        ? config.retry_delay 
-        : RETRY_DELAY;
+export default function validateAndLoadConfig(config: Record<string, unknown>) {
+    const username = getString(config, "username", "")
+    if (!username) throw new Error("Configuration error: 'username' is required.");
 
-    const use_cookie = config.use_cookie === true;
-    const cookie_path = typeof config.cookie_path === "string" && config.cookie_path.trim() !== "" 
-        ? config.cookie_path 
-        : COOKIE_PATH;
-
-    const get_cookie = config.get_cookie === true;
-
-    const output = typeof config.output === "string" && config.output.trim() !== "" 
-        ? config.output 
-        : OUTPUT_DIR;
-
-    const region = typeof config.region === "string" && config.region.trim() !== "" 
-        ? config.region 
-        : TIKTOK_REGION; 
+    const retry_delay = getNumber(config, "retry_delay", DEFAULTS.retry_delay);
+    const use_cookie = getBoolean(config, "use_cookie", false);
+    const cookie_path = getString(config, "cookie_path", DEFAULTS.cookie_path);
+    const get_cookie = getBoolean(config, "get_cookie", false);
+    const output = getString(config, "output", DEFAULTS.output);
+    const region = getString(config, "region", DEFAULTS.region);
+    const live_quality = getString(config, "live_quality", DEFAULTS.live_quality);
+    const logging = getBoolean(config, "logging", DEFAULTS.logging);
+    const logging_delay = getNumber(config, "logging_delay", DEFAULTS.logging_delay);
 
     try {
         if (!fs.existsSync(output)) {
@@ -43,14 +33,6 @@ export default function validateAndLoadConfig(config: Record<string, unknown>): 
     } catch (err) {
         throw new Error(`Failed to create output directory '${output}'`);
     }
-
-    const live_quality = typeof config.live_quality === "string" && config.live_quality.trim() !== "" 
-        ? config.live_quality
-        : LIVE_QUALITY;
-
-    const logging = typeof config.logging === "boolean" ? config.logging : LOGGING;
-
-    const logging_delay = typeof config.logging_delay === "number" ? config.logging_delay : LOGGING_DELAY;
 
     return { 
         username, 
@@ -64,4 +46,22 @@ export default function validateAndLoadConfig(config: Record<string, unknown>): 
         logging,
         logging_delay,
     };
+}
+
+function getString(config: Record<string, unknown>, key: string, defaultValue: string): string {
+    return typeof config[key] === "string" && config[key]?.trim() !== "" 
+        ? (config[key] as string).trim() 
+        : defaultValue;
+}
+
+function getBoolean(config: Record<string, unknown>, key: string, defaultValue: boolean): boolean {
+    return typeof config[key] === "boolean" 
+        ? config[key] 
+        : defaultValue;
+}
+
+function getNumber(config: Record<string, unknown>, key: string, defaultValue: number): number {
+    return typeof config[key] === "number" && config[key] > 0 
+        ? config[key] 
+        : defaultValue;
 }

@@ -1,5 +1,5 @@
 import { DEFAULT_HEADERS } from "../constants/appConstants";
-import loadCookie, { COOKIE_PATH, GET_COOKIE, isCookiesEmpty } from "./cookieUtils";
+import loadCookie, { isCookiesEmpty } from "./cookieUtils";
 
 export async function fetchSite(url: string): Promise<string> {
     const response: Response = await fetch(url, { headers: DEFAULT_HEADERS });
@@ -12,7 +12,7 @@ export async function fetchJSON<T>(url: string): Promise<T> {
     if (!await isCookiesEmpty()) {
         response = await fetch(url, {
             headers: {
-                "Cookie": await loadCookie(COOKIE_PATH, GET_COOKIE),
+                "Cookie": await loadCookie(),
             }
         });
     } else {

@@ -1,9 +1,10 @@
+import config from '../config/config';
 import fs from 'node:fs/promises';
 
-export default async function startRecording(urls: string[], output: string, live_quality: string, logging: boolean, logging_delay: number) {
+export default async function startRecording(urls: string[]) {
     try {
 
-        const url = await getQuality(live_quality, urls);
+        const url = await getQuality(config.live_quality, urls);
         const response = await fetch(url)
         const rdr = response.body?.getReader();
         if (!rdr) throw new Error("Failed to read response body");
@@ -13,7 +14,7 @@ export default async function startRecording(urls: string[], output: string, liv
             .replace(/:/g, "-")
             .replace(/\..+$/, "")}.flv`;
         
-        const fileHandle = await fs.open(`${output}/${name}`, "w");
+        const fileHandle = await fs.open(`${config.output}/${name}`, "w");
         const writer = fileHandle.createWriteStream();
 
         // Handle Ctrl+C
@@ -44,9 +45,9 @@ export default async function startRecording(urls: string[], output: string, liv
                 totalBytes += chunk?.length || 0;
                 writer.write(chunk);
 
-                if (logging) {
+                if (config.logging) {
                     const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
-                    if (elapsedTime - lastElapsedTime >= logging_delay) {
+                    if (elapsedTime - lastElapsedTime >= config.logging_delay) {
                         lastElapsedTime = elapsedTime;
                         const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
                         const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');

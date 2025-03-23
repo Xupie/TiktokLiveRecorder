@@ -1,20 +1,19 @@
+import config from '../config/config';
 import fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 export let COOKIE_PATH = "";
 export let GET_COOKIE = false;
 
-export default async function loadCookie(path: string, get_cookie: boolean): Promise<string> {
-    COOKIE_PATH = path;
-    GET_COOKIE = get_cookie;
-    if (!fs.existsSync(path)) fs.writeFile(path, "[]", err => {
+export default async function loadCookie(): Promise<string> {
+    if (!fs.existsSync(config.cookie_path)) fs.writeFile(config.cookie_path, "[]", err => {
         if (err) console.error(err);
         console.log("Created cookie file.");
     });
 
-    if (get_cookie && await isCookiesEmpty()) await getCookies();
+    if (config.get_cookie && await isCookiesEmpty()) await getCookies();
 
-    let cookieSTR = new TextDecoder().decode(await readFile(path))
+    let cookieSTR = new TextDecoder().decode(await readFile(config.cookie_path))
     const cookieJson = await JSON.parse(cookieSTR) as { name: string, value: string }[];
     cookieSTR = cookieJson
         .map(cookie => `${cookie.name}=${cookie.value}`)
