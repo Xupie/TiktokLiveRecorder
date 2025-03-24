@@ -1,5 +1,5 @@
 username=""
-retry_delay=5000 # default = 5000
+retry_delay=30000 # default = 30000
 output="" # default = "./recordings"
 live_quality="" # options = "highest" (default), "medium", "lowest"
 region="" # default = "FI"

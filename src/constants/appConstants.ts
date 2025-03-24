@@ -1,4 +1,4 @@
-export const RETRY_DELAY: number = 5000;
+export const RETRY_DELAY: number = 30000;
 export const COOKIE_PATH: string = "./cookie.json";
 export const CONFIG_FILE_PATH: string = "./config.toml";
 
