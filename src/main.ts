@@ -12,8 +12,11 @@ import { logger } from './logger';
     if (config.use_cookie) await loadCookie();
 
     await retry(() => checkIfBlacklisted(config.username)) 
-      ? logger.warn("User is blacklisted")
-      : logger.info("Not Blacklisted");      
+      ? () => {
+        sendWebhookMessage("User is blacklisted");
+        return logger.warn("User is blacklisted");
+      }
+      : logger.info("Not Blacklisted");
     
     const roomID: number | null = await retry(() => getRoomID(config.username));
     if (roomID === null) return logger.warn("Failed to get room ID");
