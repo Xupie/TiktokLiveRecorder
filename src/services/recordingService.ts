@@ -80,7 +80,7 @@ async function getQuality(quality: string , urls: string[]): Promise<string> {
             return urls[0];
 
         case "medium":
-            return urls[Math.floor(urls.length - urls.length / 2)];
+            return urls[Math.floor(urls.length / 2)];
 
         case "lowest":
             return urls[urls.length - 1];
