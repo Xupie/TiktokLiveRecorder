@@ -2,12 +2,19 @@ import { sendWebhookMessage } from '../utils/webhookUtils';
 import config from '../config/config';
 import fs from 'node:fs/promises';
 import { logger } from '../logger';
+import { WriteStream } from "fs";
 
 /**
  * Starts recording a livestream from URL
  * @param urls Stream URLs
  */
 export default async function startRecording(urls: string[]) {
+    let fileHandle: fs.FileHandle | null = null;
+    let writer: WriteStream | null = null;
+    let filePath: string = "";
+    let dataWritten: boolean = false;
+    let totalBytes: number = 0;
+
     try {
         const url = await getQuality(config.live_quality, urls);
         const response = await fetch(url)
@@ -18,16 +25,16 @@ export default async function startRecording(urls: string[]) {
         const filename = `${new Date().toISOString()
             .replace(/:/g, "-")
             .replace(/\..+$/, "")}.flv`;
-        const filePath = `${config.output}/${filename}`
+        filePath = `${config.output}/${filename}`
         
-        const fileHandle = await fs.open(filePath, "w");
-        const writer = fileHandle.createWriteStream();
+        fileHandle = await fs.open(filePath, "w");
+        writer = fileHandle.createWriteStream();
 
         logger.info(`Recording started: ${filePath}`);
 
         // Shutdown Handler
         ["SIGINT", "SIGTERM", "SIGHUP", "uncaughtException", "exit"].forEach((signal) => {
-            process.on(signal, (err) => {
+            process.once(signal, (err) => {
                 logger.info("Closing file...")
                 if (writer) writer.close();
                 if (signal === "uncaughtException") logger.error(err);
@@ -36,36 +43,66 @@ export default async function startRecording(urls: string[]) {
         });
         process.stdin.resume();
 
-        try {
-            let totalBytes = 0;
-            let lastElapsedTime = 0;
-            
-            while (true) {
-                const { value: chunk, done } = await rdr.read();
-                if (done) break;
+        let lastElapsedTime = Date.now();
+        for await (const chunk of readStream(rdr)) {
+            totalBytes += chunk.length;
+            writer.write(chunk);
+            dataWritten = true;
 
-                totalBytes += chunk?.length || 0;
-                writer.write(chunk);
-
-                if (config.logging) {
-                    const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
-                    if (elapsedTime - lastElapsedTime >= config.logging_delay) {
-                        lastElapsedTime = elapsedTime;
-                        const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
-                        const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');
-                        const seconds = Math.floor(elapsedTime % 60).toString().padStart(2, '0');
-                        logger.info(`[${hours}:${minutes}:${seconds}] ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
-                    }
+            if (config.logging) {
+                const elapsedTime = (Date.now() - startTime) / 1000; // Time in seconds
+                if ((Date.now() - lastElapsedTime) >= config.logging_delay * 1000) {
+                    lastElapsedTime = Date.now();
+                    logProgress(elapsedTime, totalBytes);
                 }
             }
-        } finally {
-            writer.close();
-            logger.info(`Recording finished: ${filePath}`);
-            sendWebhookMessage(`${config.username}'s live ended.`);
         }
     } catch (err) {
-        logger.error("An error occurred while recording:", err);
+        logger.error("An error occurred while recording:", err instanceof Error ? err.stack : err);
+    } finally {
+        try {
+            if (writer) writer.close();
+            if (fileHandle) await fileHandle.close();
+
+            if (dataWritten) {
+                if (totalBytes === 0) {
+                    await fs.unlink(filePath);
+                    logger.info(`No data received. Deleted empty file: ${filePath}`);
+                }
+                else {
+                    logger.info(`Recording finished: ${filePath}`);
+                }
+            }
+        }
+        catch (error) {
+            logger.error(`Failed to close: ${error}`);
+        }
+        sendWebhookMessage(`${config.username}'s live ended.`);
     }
+}
+
+/**
+ * Reads chunks from the readable stream.
+ * @param reader Readable stream reader
+ */
+async function* readStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
+    while (true) {
+        const { value: chunk, done } = await reader.read();
+        if (done) break;
+        yield chunk;
+    }
+}
+
+/**
+ * Logs recording progress.
+ * @param elapsedTime Time elapsed in seconds
+ * @param totalBytes Total bytes written to file
+ */
+function logProgress(elapsedTime: number, totalBytes: number) {
+    const hours = Math.floor(elapsedTime / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0');
+    const seconds = Math.floor(elapsedTime % 60).toString().padStart(2, '0');
+    logger.info(`[${hours}:${minutes}:${seconds}] ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
 }
 
 /**
